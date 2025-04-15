@@ -7,18 +7,14 @@ app = Flask(__name__)
 predictor = load_predictor("network_model.pkl")
 
 def capture_packets():
-    # Grab 50 packets to avoid slowing down the system
     packets = sniff(count=50, timeout=10)
     sizes = [len(pkt) for pkt in packets]
     return np.array(sizes).reshape(1, -1)
 
 @app.route("/")
 def dashboard():
-    # Check network traffic for potential issues
     packet_data = capture_packets()
     risk_score = predictor.predict(packet_data)[0]
-    
-    # Basic rule: score > 0.5 means trouble
     status = "Network Stable" if risk_score < 0.5 else "Possible Threat!"
     return render_template("dashboard.html", status=status, score=round(risk_score, 2))
 
