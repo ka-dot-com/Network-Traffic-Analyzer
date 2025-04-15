@@ -7,9 +7,13 @@ app = Flask(__name__)
 predictor = load_predictor("network_model.pkl")
 
 def capture_packets():
-    packets = sniff(count=50, timeout=10)
-    sizes = [len(pkt) for pkt in packets]
-    return np.array(sizes).reshape(1, -1)
+    try:
+        packets = sniff(count=50, timeout=10)
+        sizes = [len(pkt) for pkt in packets]
+        return np.array(sizes).reshape(1, -1)
+    except Exception as e:
+        print(f"Error capturing packets: {e}")
+        return np.zeros((1, 50))
 
 @app.route("/")
 def dashboard():
