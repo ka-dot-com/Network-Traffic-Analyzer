@@ -1,27 +1,32 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, Response
 from scapy.all import sniff
-import numpy as np
-from model import load_predictor
+import threading
+import time
 
 app = Flask(__name__)
-predictor = load_predictor("network_model.pkl")
+packet_data = []
 
 def capture_packets():
-    try:
-        packets = sniff(count=50, timeout=10)
-        sizes = [len(pkt) for pkt in packets]
-        return np.array(sizes).reshape(1, -1)
-    except Exception as e:
-        print(f"Error capturing packets: {e}")
-        return np.zeros((1, 50))
+    global packet_data
+    while True:
+        packets = sniff(count=10, timeout=5)
+        packet_data = [{"size": len(pkt), "summary": str(pkt.summary())} for pkt in packets]
+        time.sleep(5)
 
 @app.route("/")
 def dashboard():
-    packet_data = capture_packets()
-    risk_score = predictor.predict(packet_data)[0]
-    status = "Network Stable" if risk_score < 0.5 else "Possible Threat!"
-    return render_template("dashboard.html", status=status, score=round(risk_score, 2))
+    return render_template("dashboard.html")
+
+def generate_data():
+    global packet_data
+    while True:
+        yield f"data: {packet_data}\n\n"
+        time.sleep(5)
+
+@app.route("/data")
+def data_stream():
+    return Response(generate_data(), content_type="text/event-stream")
 
 if __name__ == "__main__":
-    print("Starting Network Traffic Analyzer on http://localhost:5000")
-    app.run(debug=False, host="0.0.0.0", port=5000)
+    threading.Thread(target=capture_packets, daemon=True).start()
+    app.run(debug=True, host="0.0.0.0", port=5000)
