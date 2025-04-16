@@ -1,23 +1,17 @@
 # Network Traffic Analyzer
 
-A web app to monitor network traffic and spot threats like DDoS attacks. Built with Python, Flask, and a lightweight ML model
+A Python-based real-time network traffic analyzer with a web dashboard. Provides insights into network packets and helps predict traffic anomalies.
 
-## How It Works
-- Captures packets using Scapy
-- Analyzes packet sizes with a RandomForest model
-- Shows a dashboard with status and risk score
+## Features
+- Real-time updates on network traffic via a web dashboard
+- Includes additional packet features for more accurate predictions
+- Flask-based backend for easy data processing
 
 ## Setup
 1. Install Python 3.8+
 2. Run `pip install -r requirements.txt`
-3. Start with `python app.py`
-4. Visit http://localhost:5000
+3. Start the application with `python app.py`
+4. Access the dashboard at `http://localhost:5000`
 
 ## Use Case
-Gives admins a simple way to check network health without heavy tools. Useful for small networks needing quick threat detection
-
-## Future Improvements
-- Add real-time updates to the dashboard
-- Include more packet features for better predictions
-
-Contact: kswierczynska21@gmail.com
+Useful for network administrators and security analysts to monitor network traffic in real-time and identify potential anomalies
